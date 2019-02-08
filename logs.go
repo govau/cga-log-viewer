@@ -20,7 +20,8 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 		return nil, err
 	}
 
-	results, err := server.ElasticClient.Search("_all").Query(elastic.NewQueryStringQuery(vars["query"])).Size(100).Do(r.Context())
+	q := vars["query"]
+	results, err := server.ElasticClient.Search("_all").Query(elastic.NewQueryStringQuery(q)).Size(100).Do(r.Context())
 	var message string
 	var rs resultSet
 
@@ -41,7 +42,8 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 
 	return map[string]interface{}{
 		"app":     a,
+		"query":   q,
 		"message": message,
-		"results": rs,
+		"results": []resultSet{rs},
 	}, nil
 }
