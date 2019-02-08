@@ -24,7 +24,9 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 	}
 
 	q := r.FormValue("query")
-	results, err := server.ElasticClient.Search("_all").Query(elastic.NewQueryStringQuery(q)).Size(100).Do(r.Context())
+	results, err := server.ElasticClient.Search("_all").Query(
+		elastic.NewBoolQuery().Filter(elastic.NewTermQuery("MINUTE", "07")).Must(elastic.NewQueryStringQuery(q)),
+	).Size(100).Do(r.Context())
 	var message string
 	var rs resultSet
 
