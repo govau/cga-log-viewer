@@ -18,7 +18,7 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 	// By calling CF as the user, this has the side-effect of verifying
 	// that the user has a level of access to the app.
 	// TODO: consider verifying a bit more affirmatively
-	a, err := cli.AppByGuid(r.FormValue("app"))
+	a, err := cli.AppByGuid(vars["app"])
 	if err != nil {
 		return nil, err
 	}

@@ -9,7 +9,6 @@
         <p>Enter the query to execute. Note such queries may be logged and reviewed.</p>
         <form method="POST">
             {{ .csrfField }}
-            <input type="hidden" name="app" value="{{ .app.Guid }}" />
             <textarea name="query" row="4" cols="80">{{ .query }}</textarea>
             <br />
             Username: {{ .user.EmailAddress }} <input type="submit" value="Execute" />
