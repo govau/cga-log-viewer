@@ -15,12 +15,15 @@ type resultSet struct {
 
 // search logs for an app
 func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *uaa.LoggedInUser, w http.ResponseWriter, r *http.Request) (map[string]interface{}, error) {
-	a, err := cli.AppByGuid(vars["app"])
+	// By calling CF as the user, this has the side-effect of verifying
+	// that the user has a level of access to the app.
+	// TODO: consider verifying a bit more affirmatively
+	a, err := cli.AppByGuid(r.FormValue("app"))
 	if err != nil {
 		return nil, err
 	}
 
-	q := vars["query"]
+	q := r.FormValue("query")
 	results, err := server.ElasticClient.Search("_all").Query(elastic.NewQueryStringQuery(q)).Size(100).Do(r.Context())
 	var message string
 	var rs resultSet
