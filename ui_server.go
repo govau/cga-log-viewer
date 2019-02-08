@@ -49,11 +49,6 @@ type server struct {
 	ElasticClient *elastic.Client
 }
 
-type resultSet struct {
-	Headers []string
-	Rows    [][]string
-}
-
 // Shows all apps for space
 func (server *server) apps(cli *cfclient.Client, vars map[string]string, liu *uaa.LoggedInUser, w http.ResponseWriter, r *http.Request) (map[string]interface{}, error) {
 	apps, err := cli.ListAppsByQuery(url.Values{
