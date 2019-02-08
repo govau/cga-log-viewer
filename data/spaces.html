@@ -1,0 +1,13 @@
+<html>
+    <head>
+        <title>Spaces</title>
+    </head>
+    <body>
+        <p>We found the following spaces:</p>
+        <ul>
+            {{ range .spaces }}
+            <li><a href="/space/{{ .Guid }}/apps">{{ .Name }}</a></li>
+            {{ end }}
+        </ul>
+    </body>
+</html>

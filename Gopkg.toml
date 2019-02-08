@@ -1,0 +1,23 @@
+[[constraint]]
+  branch = "master"
+  name = "github.com/cloudfoundry-community/go-cfclient"
+
+[[constraint]]
+  name = "github.com/cloudfoundry-community/go-cfenv"
+  version = "1.17.0"
+
+[[constraint]]
+  name = "github.com/gorilla/csrf"
+  version = "1.5.0"
+
+[[constraint]]
+  name = "github.com/gorilla/mux"
+  version = "1.6.1"
+
+[[constraint]]
+  name = "github.com/govau/cf-common"
+  version = "0.0.3"
+
+[prune]
+  go-tests = true
+  unused-packages = true

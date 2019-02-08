@@ -1,0 +1,15 @@
+<html>
+    <head>
+        <title>Job</title>
+        {{ if not .jobInfo.Complete }}
+            <meta http-equiv="refresh" content="5" />
+        {{ end }}
+    </head>
+    <body>
+        <p>Log for job:</p>
+        <pre>{{ .jobInfo.Log }}</pre>
+        {{ if not .jobInfo.Complete }}
+            <p>Refreshing in 5 seconds...</p>
+        {{ end }}
+    </body>
+</html>

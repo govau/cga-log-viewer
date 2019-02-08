@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <title>View logs</title>
+    </head>
+    <body>
+        <p>Execute logs query against <b>{{ .app.Name }} - ({{ .app.Guid }})</b>?</p>
+        <hr/>
+        <h2>Query</h2>
+        <p>Enter the query to execute. Note such queries may be logged and reviewed.</p>
+        <form method="POST">
+            {{ .csrfField }}
+            <input type="hidden" name="app" value="{{ .app.Guid }}" />
+            <textarea name="query" row="4" cols="80">{{ .query }}</textarea>
+            <br />
+            Username: {{ .user.EmailAddress }} <input type="submit" value="Execute" />
+        </form>
+        <hr />
+        <pre>{{ .message }}</pre>
+        {{ range .results }}
+            <table border="1">
+                <tr>
+                    {{ range .Headers }}
+                        <th>{{ . }}</th>
+                    {{ end }}
+                </tr>
+                {{ range .Rows }}
+                    <tr>
+                        {{ range . }}
+                            <td>{{ . }}</td>
+                        {{ end }}
+                    </tr>
+                {{ end }}
+            </table>
+        {{ end }}
+        <hr />
+    </body>
+</html>

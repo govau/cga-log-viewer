@@ -1,0 +1,13 @@
+<html>
+    <head>
+        <title>Apps</title>
+    </head>
+    <body>
+        <p>We found the following apps:</p>
+        <ul>
+            {{ range .apps }}
+            <li><a href="/app/{{ .Guid }}/logs">{{ .Name }}</a></li>
+            {{ end }}
+        </ul>
+    </body>
+</html>
