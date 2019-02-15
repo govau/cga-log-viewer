@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 
@@ -34,13 +36,23 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 	}
 
 	q := r.FormValue("query")
-	results, err := server.ElasticClient.Search("_all").Query(
-		elastic.NewBoolQuery().Filter(
-			elastic.NewTermQuery("@cf.env", server.CFEnv),
-			elastic.NewTermQuery("@cf.space_id", a.SpaceGuid),
-			elastic.NewTermQuery("@cf.app", stripSuffixes(a.Name)), // we use name here as it's more robust across blue/green style deployments
-		).Must(elastic.NewQueryStringQuery(q)),
-	).Size(100).Do(r.Context())
+	query := elastic.NewBoolQuery().Filter(
+		elastic.NewTermQuery("@cf.env", server.CFEnv),
+		elastic.NewTermQuery("@cf.space_id", a.SpaceGuid),
+		elastic.NewTermQuery("@cf.app", stripSuffixes(a.Name)), // we use name here as it's more robust across blue/green style deployments
+	).Must(elastic.NewQueryStringQuery(q))
+
+	src, err := query.Source()
+	if err != nil {
+		log.Println(err)
+	}
+	data, err := json.MarshalIndent(src, "", "  ")
+	if err != nil {
+		log.Println(err)
+	}
+	log.Printf("Query:\n%s", data)
+
+	results, err := server.ElasticClient.Search("_all").Query(query).Size(100).Do(r.Context())
 	var message string
 	var rs resultSet
 
