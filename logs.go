@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strings"
 
 	cfclient "github.com/cloudfoundry-community/go-cfclient"
 	"github.com/govau/cf-common/uaa"
@@ -11,6 +12,15 @@ import (
 type resultSet struct {
 	Headers []string
 	Rows    [][]string
+}
+
+func stripSuffixes(s string) string {
+	for _, x := range []string{"-venerable", "-blue", "-green"} {
+		if strings.HasSuffix(s, x) {
+			return s[:len(s)-len(x)]
+		}
+	}
+	return s
 }
 
 // search logs for an app
@@ -25,8 +35,11 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 
 	q := r.FormValue("query")
 	results, err := server.ElasticClient.Search("_all").Query(
-		//elastic.NewBoolQuery().Filter(elastic.NewTermQuery("MINUTE", "07")).Must(elastic.NewQueryStringQuery(q)),
-		elastic.NewQueryStringQuery(q),
+		elastic.NewBoolQuery().Filter(
+			elastic.NewTermQuery("@cf.env", server.CFEnv),
+			elastic.NewTermQuery("@cf.space_id", a.SpaceGuid),
+			elastic.NewTermQuery("@cf.app", stripSuffixes(a.Name)), // we use name here as it's more robust across blue/green style deployments
+		).Must(elastic.NewQueryStringQuery(q)),
 	).Size(100).Do(r.Context())
 	var message string
 	var rs resultSet

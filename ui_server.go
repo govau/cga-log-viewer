@@ -47,6 +47,9 @@ type server struct {
 
 	// Client for searching logs
 	ElasticClient *elastic.Client
+
+	// CFEnv must filter
+	CFEnv string
 }
 
 // Shows all apps for space
