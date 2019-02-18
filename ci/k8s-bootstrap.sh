@@ -14,19 +14,20 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: "${NAMESPACE}"
----
+EOF
+)
+
+kubectl -n "${NAMESPACE}" apply -f <(cat <<EOF
 # Create a service account for deployment
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: "${ci_user}"
-  namespace: "${NAMESPACE}"
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: istio-config
-  namespace: "${NAMESPACE}"
 rules:
 - apiGroups: ["networking.istio.io"]
   resources: ["serviceentry", "virtualservice"]
@@ -36,7 +37,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: ci-user-can-do-istio-config
-  namespace: "${NAMESPACE}"
 roleRef:
   name: istio-config
   kind: Role
@@ -52,7 +52,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: ci-user-can-deploy
-  namespace: "${NAMESPACE}"
 roleRef:
   name: edit
   kind: ClusterRole
@@ -66,7 +65,6 @@ apiVersion: "authentication.istio.io/v1alpha1"
 kind: "Policy"
 metadata:
   name: "default"
-  namespace: "${NAMESPACE}"
 spec:
   peers:
   - mtls:
@@ -76,7 +74,6 @@ apiVersion: "networking.istio.io/v1alpha3"
 kind: "DestinationRule"
 metadata:
   name: "default"
-  namespace: "${NAMESPACE}"
 spec:
   host: "*.local"
   trafficPolicy:
@@ -87,7 +84,6 @@ apiVersion: networking.istio.io/v1alpha3
 kind: ServiceEntry
 metadata:
   name: es
-  namespace: "${NAMESPACE}"
 spec:
   hosts:
   - "${ES_HOSTNAME}"
@@ -102,7 +98,6 @@ apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: es
-  namespace: "${NAMESPACE}"
 spec:
   hosts:
   - "${ES_HOSTNAME}"
