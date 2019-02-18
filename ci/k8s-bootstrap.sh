@@ -27,7 +27,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: istio-config
 rules:
-- apiGroups: ["config.istio.io"] # "" indicates the core API group
+- apiGroups: ["networking.istio.io"]
   resources: ["serviceentry", "virtualservice"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 ---
