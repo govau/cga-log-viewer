@@ -78,7 +78,7 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 	return map[string]interface{}{
 		"app":     a,
 		"query":   q,
-		"esquery": data,
+		"esquery": string(data),
 		"message": message,
 		"results": []resultSet{rs},
 	}, nil
