@@ -22,6 +22,29 @@ metadata:
   name: "${ci_user}"
   namespace: "${NAMESPACE}"
 ---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: istio-config
+rules:
+- apiGroups: ["config.istio.io"] # "" indicates the core API group
+  resources: ["serviceentry", "virtualservice"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ci-user-can-do-istio-config
+  namespace: "${NAMESPACE}"
+roleRef:
+  name: istio-config
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- name: "${ci_user}"
+  namespace: "${NAMESPACE}"
+  kind: ServiceAccount
+---
 # Give appropriate permissions for being able to
 # deploy into this namespace
 apiVersion: rbac.authorization.k8s.io/v1

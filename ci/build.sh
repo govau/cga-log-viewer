@@ -114,7 +114,7 @@ spec:
         - name: PORT
           value: "5601"
         - name: INSECURE
-          value: true # used for cookies, we need to enable TLS serving before re-instating
+          value: "true" # used for cookies, we need to enable TLS serving before re-instating
         envFrom:
         - secretRef: {name: ${ENV}cld-log-viewer}
         - secretRef: {name: shared-log-viewer}
