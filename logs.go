@@ -36,11 +36,16 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 	}
 
 	q := r.FormValue("query")
-	query := elastic.NewBoolQuery().Filter(
-		elastic.NewTermQuery("@cf.env", server.CFEnv),
-		elastic.NewTermQuery("@cf.space_id", a.SpaceGuid),
-		elastic.NewTermQuery("@cf.app", stripSuffixes(a.Name)), // we use name here as it's more robust across blue/green style deployments
-	).Must(elastic.NewMatchAllQuery())
+	var query elastic.Query
+	if strings.HasPrefix(q, "{") {
+		query = elastic.NewRawStringQuery(q)
+	} else {
+		query = elastic.NewBoolQuery().Filter(
+			elastic.NewTermQuery("@cf.env", server.CFEnv),
+			elastic.NewTermQuery("@cf.space_id", a.SpaceGuid),
+			elastic.NewTermQuery("@cf.app", stripSuffixes(a.Name)), // we use name here as it's more robust across blue/green style deployments
+		).Must(elastic.NewQueryStringQuery(q))
+	}
 
 	src, err := query.Source()
 	if err != nil {
@@ -50,7 +55,6 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 	if err != nil {
 		log.Println(err)
 	}
-	log.Printf("Query:\n%s", data)
 
 	results, err := server.ElasticClient.Search("_all").Query(query).Size(100).Do(r.Context())
 	var message string
@@ -74,6 +78,7 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 	return map[string]interface{}{
 		"app":     a,
 		"query":   q,
+		"esquery": data,
 		"message": message,
 		"results": []resultSet{rs},
 	}, nil
