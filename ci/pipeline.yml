@@ -1,5 +1,5 @@
 jobs:
-- name: cga-log-viewer-build-container-image
+- name: log-viewer-build-container-image
   serial: true
   plan:
   - do:
@@ -22,6 +22,91 @@ jobs:
         text: |
           :x: $BUILD_JOB_NAME FAILED
           <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+- name: log-viewer-deploy-d
+  serial: true
+  plan:
+  - do:
+    - get: src
+      passed: [log-viewer-build-container-image]
+    - get: ci
+      trigger: true
+    - get: img
+      passed: [log-viewer-build-container-image]
+      params: {skip_download: true}
+      trigger: true
+    - task: build
+      file: ci/ci/build.yml
+      params:
+        ENV: "d"
+        KUBECONFIG: ((kubeconfig))
+    on_success:
+      put: slack
+      params:
+        text: |
+          :white_check_mark: $BUILD_JOB_NAME SUCCESS
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: $BUILD_JOB_NAME FAILED
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+- name: log-viewer-deploy-y
+  serial: true
+  plan:
+  - do:
+    - get: src
+      passed: [log-viewer-deploy-d]
+    - get: ci
+      passed: [log-viewer-deploy-d]
+    - get: img
+      passed: [log-viewer-deploy-d]
+      params: {skip_download: true}
+    - task: build
+      file: ci/ci/build.yml
+      params:
+        ENV: "y"
+        KUBECONFIG: ((kubeconfig))
+    on_success:
+      put: slack
+      params:
+        text: |
+          :white_check_mark: $BUILD_JOB_NAME SUCCESS
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: $BUILD_JOB_NAME FAILED
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+- name: log-viewer-deploy-b
+  serial: true
+  plan:
+  - do:
+    - get: src
+      passed: [log-viewer-deploy-y]
+    - get: ci
+      passed: [log-viewer-deploy-y]
+    - get: img
+      passed: [log-viewer-deploy-y]
+      params: {skip_download: true}
+    - task: build
+      file: ci/ci/build.yml
+      params:
+        ENV: "b"
+        KUBECONFIG: ((kubeconfig))
+    on_success:
+      put: slack
+      params:
+        text: |
+          :white_check_mark: $BUILD_JOB_NAME SUCCESS
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: $BUILD_JOB_NAME FAILED
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
 resources:
 - name: src
   type: git
@@ -29,6 +114,13 @@ resources:
     uri: https://github.com/govau/cga-log-viewer
     branch: master
     ignore_paths:
+    - ci/**
+- name: ci
+  type: git
+  source:
+    uri: https://github.com/govau/cga-log-viewer
+    branch: master
+    paths:
     - ci/**
 - name: img
   type: docker-image
