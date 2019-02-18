@@ -40,7 +40,7 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 		elastic.NewTermQuery("@cf.env", server.CFEnv),
 		elastic.NewTermQuery("@cf.space_id", a.SpaceGuid),
 		elastic.NewTermQuery("@cf.app", stripSuffixes(a.Name)), // we use name here as it's more robust across blue/green style deployments
-	).Must(elastic.NewQueryStringQuery(q))
+	).Must(elastic.NewMatchAllQuery())
 
 	src, err := query.Source()
 	if err != nil {
@@ -52,7 +52,7 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 	}
 	log.Printf("Query:\n%s", data)
 
-	results, err := server.ElasticClient.Search("_all").Query(elastic.NewQueryStringQuery(q)).Size(100).Do(r.Context())
+	results, err := server.ElasticClient.Search("_all").Query(query).Size(100).Do(r.Context())
 	var message string
 	var rs resultSet
 
