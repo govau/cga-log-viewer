@@ -62,6 +62,7 @@ jobs:
     - get: img
       passed: [log-viewer-deploy-d]
       params: {skip_download: true}
+      trigger: true
     - task: build
       file: ci/ci/build.yml
       params:
@@ -90,6 +91,7 @@ jobs:
     - get: img
       passed: [log-viewer-deploy-y]
       params: {skip_download: true}
+      trigger: true
     - task: build
       file: ci/ci/build.yml
       params:
