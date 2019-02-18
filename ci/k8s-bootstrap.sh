@@ -30,8 +30,8 @@ metadata:
   name: istio-config
 rules:
 - apiGroups: ["networking.istio.io"]
-  resources: ["serviceentry", "virtualservice"]
-  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  resources: ["serviceentries", "virtualservices"]
+  verbs: ["*"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
