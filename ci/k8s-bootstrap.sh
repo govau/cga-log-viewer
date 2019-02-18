@@ -26,6 +26,7 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: istio-config
+  namespace: "${NAMESPACE}"
 rules:
 - apiGroups: ["networking.istio.io"]
   resources: ["serviceentry", "virtualservice"]
@@ -65,6 +66,7 @@ apiVersion: "authentication.istio.io/v1alpha1"
 kind: "Policy"
 metadata:
   name: "default"
+  namespace: "${NAMESPACE}"
 spec:
   peers:
   - mtls:
@@ -74,6 +76,7 @@ apiVersion: "networking.istio.io/v1alpha3"
 kind: "DestinationRule"
 metadata:
   name: "default"
+  namespace: "${NAMESPACE}"
 spec:
   host: "*.local"
   trafficPolicy:
@@ -84,6 +87,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: ServiceEntry
 metadata:
   name: es
+  namespace: "${NAMESPACE}"
 spec:
   hosts:
   - "${ES_HOSTNAME}"
@@ -98,6 +102,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: es
+  namespace: "${NAMESPACE}"
 spec:
   hosts:
   - "${ES_HOSTNAME}"
