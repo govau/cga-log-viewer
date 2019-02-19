@@ -41,9 +41,9 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 		query = elastic.NewRawStringQuery(q)
 	} else {
 		query = elastic.NewBoolQuery().Filter(
-			elastic.NewTermQuery("@cf.env", server.CFEnv),
-			elastic.NewTermQuery("@cf.space_id", a.SpaceGuid),
-			elastic.NewTermQuery("@cf.app", stripSuffixes(a.Name)), // we use name here as it's more robust across blue/green style deployments
+			elastic.NewTermQuery("@cf.env.keyword", server.CFEnv),
+			elastic.NewTermQuery("@cf.space_id.keyword", a.SpaceGuid),
+			elastic.NewTermQuery("@cf.app.keyword", stripSuffixes(a.Name)), // we use name here as it's more robust across blue/green style deployments
 		).Must(elastic.NewQueryStringQuery(q))
 	}
 
