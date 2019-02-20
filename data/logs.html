@@ -12,6 +12,9 @@
             <textarea name="query" row="4" cols="80">{{ .query }}</textarea>
             <br />
             Username: {{ .user.EmailAddress }} <input type="submit" value="Execute" />
+            From: <input size="6" name="from" value="{{ .from }}" />
+            To: <input size="6" name="to" value="{{ .to }}" />
+            Limit: <input size="6" name="limit" value="{{ .limit }}" />
         </form>
         <hr />
         <pre>{{ .message }}</pre>
