@@ -54,6 +54,9 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 	var results *elastic.SearchResult
 	var src interface{}
 	var limitInt int
+	var fromDuration, toDuration time.Duration
+
+	now := time.Now()
 
 	// By calling CF as the user, this has the side-effect of verifying
 	// that the user has a level of access to the app.
@@ -68,28 +71,21 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 		goto end
 	}
 
-	if strings.HasPrefix(q, "{") {
-		query = elastic.NewRawStringQuery(q)
-	} else {
-		var fromDuration, toDuration time.Duration
-		fromDuration, err = time.ParseDuration(from)
-		if err != nil {
-			goto end
-		}
-		toDuration, err = time.ParseDuration(to)
-		if err != nil {
-			goto end
-		}
-
-		now := time.Now()
-
-		query = elastic.NewBoolQuery().Filter(
-			elastic.NewRangeQuery("kinesis_time").Gte(now.Add(-fromDuration).UnixNano()/1000000).Lt(now.Add(-toDuration).UnixNano()/1000000),
-			elastic.NewTermQuery("@cf.env.keyword", server.CFEnv),
-			elastic.NewTermQuery("@cf.space_id.keyword", a.SpaceGuid),
-			elastic.NewTermQuery("@cf.app.keyword", stripSuffixes(a.Name)), // we use name here as it's more robust across blue/green style deployments
-		).Must(elastic.NewQueryStringQuery(q))
+	fromDuration, err = time.ParseDuration(from)
+	if err != nil {
+		goto end
 	}
+	toDuration, err = time.ParseDuration(to)
+	if err != nil {
+		goto end
+	}
+
+	query = elastic.NewBoolQuery().Filter(
+		elastic.NewRangeQuery("kinesis_time").Gte(now.Add(-fromDuration).UnixNano()/1000000).Lt(now.Add(-toDuration).UnixNano()/1000000),
+		elastic.NewTermQuery("@cf.env.keyword", server.CFEnv),
+		elastic.NewTermQuery("@cf.space_id.keyword", a.SpaceGuid),
+		elastic.NewTermQuery("@cf.app.keyword", stripSuffixes(a.Name)), // we use name here as it's more robust across blue/green style deployments
+	).Must(elastic.NewQueryStringQuery(q))
 
 	src, err = query.Source()
 	if err != nil {
@@ -113,12 +109,10 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 	}
 
 	for _, sh := range results.Hits.Hits {
-		var b []byte
-		b, err = sh.Source.MarshalJSON()
-		if err != nil {
-			goto end
+		s, ok := sh.Fields["GENERIC"].(string)
+		if ok {
+			rs.Rows = append(rs.Rows, []string{s})
 		}
-		rs.Rows = append(rs.Rows, []string{string(b)})
 	}
 
 end:
