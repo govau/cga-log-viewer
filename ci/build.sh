@@ -118,6 +118,27 @@ spec:
         envFrom:
         - secretRef: {name: ${ENV}cld-log-viewer}
         - secretRef: {name: shared-log-viewer}
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name:  ${ENV}cld-log-viewer
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    certmanager.k8s.io/cluster-issuer: "letsencrypt-prod"
+    ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  tls:
+  - secretName: ${ENV}cld-logs-certificate
+    hosts:
+    - ${ENV}cld-logs.kapps.l.cld.gov.au
+  rules:
+  - host: ${ENV}cld-logs.kapps.l.cld.gov.au
+    http:
+      paths:
+      - backend:
+          serviceName: ${ENV}cld-log-viewer
+          servicePort: 5601
 EOF
 
 cat deployment.yaml
