@@ -109,10 +109,11 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 	}
 
 	for _, sh := range results.Hits.Hits {
-		s, ok := sh.Fields["GENERIC"].(string)
-		if ok {
-			rs.Rows = append(rs.Rows, []string{s})
+		b, err := sh.Source.MarshalJSON()
+		if err != nil {
+			goto end
 		}
+		rs.Rows = append(rs.Rows, []string{string(b)})
 	}
 
 end:
