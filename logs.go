@@ -50,9 +50,7 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 	var a cfclient.App
 	var err error
 	var rs resultSet
-	var data []byte
 	var results *elastic.SearchResult
-	var src interface{}
 	var limitInt int
 	var fromDuration, toDuration time.Duration
 
@@ -87,16 +85,6 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 		elastic.NewTermQuery("@cf.app.keyword", stripSuffixes(a.Name)), // we use name here as it's more robust across blue/green style deployments
 	).Must(elastic.NewQueryStringQuery(q))
 
-	src, err = query.Source()
-	if err != nil {
-		goto end
-	}
-
-	data, err = json.MarshalIndent(src, "", "  ")
-	if err != nil {
-		goto end
-	}
-
 	results, err = server.ElasticClient.Search("_all").Query(query).Size(limitInt).Do(r.Context())
 	if err != nil {
 		goto end
@@ -113,6 +101,26 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 		if err != nil {
 			goto end
 		}
+
+		// now unmarshall so we can delete fields - there must be a better way?
+		var v map[string]interface{}
+		err = json.Unmarshal(b, &v)
+		if err != nil {
+			goto end
+		}
+		delete(v, "@cf.app")
+		delete(v, "@cf.space")
+		delete(v, "@cf.org")
+		delete(v, "@cf.app_id")
+		delete(v, "@cf.space_id")
+		delete(v, "@cf.org_id")
+		delete(v, "@cf.env")
+
+		b, err = json.Marshal(v)
+		if err != nil {
+			goto end
+		}
+
 		rs.Rows = append(rs.Rows, []string{string(b)})
 	}
 
@@ -127,7 +135,6 @@ end:
 		"from":    from,
 		"to":      to,
 		"limit":   limit,
-		"esquery": string(data),
 		"message": message,
 		"results": []resultSet{rs},
 	}, nil
