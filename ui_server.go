@@ -20,7 +20,7 @@ import (
 type location string
 
 func (l location) BaseURL() string {
-	return fmt.Sprintf("https://%scld-logs.kapps.k.cld.gov.au", l[0:1])
+	return fmt.Sprintf("https://%scld-logs.kapps.l.cld.gov.au", l[0:1])
 }
 
 func newLocationList(s string) []location {
