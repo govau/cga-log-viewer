@@ -53,6 +53,8 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 	var results *elastic.SearchResult
 	var limitInt int
 	var fromDuration, toDuration time.Duration
+	var src interface{}
+	var data []byte
 
 	now := time.Now()
 
@@ -84,6 +86,16 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 		elastic.NewTermQuery("@cf.space_id.keyword", a.SpaceGuid),
 		elastic.NewTermQuery("@cf.app.keyword", stripSuffixes(a.Name)), // we use name here as it's more robust across blue/green style deployments
 	).Must(elastic.NewQueryStringQuery(q))
+
+	src, err = query.Source()
+	if err != nil {
+		goto end
+	}
+
+	data, err = json.MarshalIndent(src, "", "  ")
+	if err != nil {
+		goto end
+	}
 
 	results, err = server.ElasticClient.Search("_all").Query(query).Size(limitInt).Do(r.Context())
 	if err != nil {
@@ -135,6 +147,7 @@ end:
 		"from":    from,
 		"to":      to,
 		"limit":   limit,
+		"esquery": string(data),
 		"message": message,
 		"results": []resultSet{rs},
 	}, nil
