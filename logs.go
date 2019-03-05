@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -12,6 +13,10 @@ import (
 	"github.com/govau/cf-common/uaa"
 	"github.com/olivere/elastic"
 )
+
+type userInfo struct {
+	GUID string `json:"user_id"`
+}
 
 type resultSet struct {
 	Headers []string
@@ -55,6 +60,11 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 	var fromDuration, toDuration time.Duration
 	var src interface{}
 	var data []byte
+	var spaces []cfclient.Space
+	var req *http.Request
+	var resp *http.Response
+	var userInfo userInfo
+	var spaceIDs []interface{}
 
 	now := time.Now()
 
@@ -62,6 +72,30 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 	// that the user has a level of access to the app.
 	// TODO: consider verifying a bit more affirmatively
 	a, err = cli.AppByGuid(vars["app"])
+	if err != nil {
+		goto end
+	}
+
+	req, err = http.NewRequest(http.MethodGet, server.UAAUrl+"/userinfo", nil)
+	if err != nil {
+		goto end
+	}
+	req.Header.Set("Authorization", "bearer "+liu.AccessToken)
+	resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		goto end
+	}
+	err = json.NewDecoder(resp.Body).Decode(&userInfo)
+	resp.Body.Close()
+	if err != nil {
+		goto end
+	}
+	if resp.StatusCode != http.StatusOK {
+		err = errors.New("bad status code from userinfo")
+		goto end
+	}
+
+	spaces, err = cli.ListUserSpaces(userInfo.GUID)
 	if err != nil {
 		goto end
 	}
@@ -80,11 +114,16 @@ func (server *server) logs(cli *cfclient.Client, vars map[string]string, liu *ua
 		goto end
 	}
 
+	spaceIDs = make([]interface{}, len(spaces))
+	for idx, sp := range spaces {
+		spaceIDs[idx] = sp.Guid
+	}
+
 	query = elastic.NewBoolQuery().Filter(
 		elastic.NewRangeQuery("kinesis_time").Gte(now.Add(-fromDuration).UnixNano()/1000000).Lt(now.Add(-toDuration).UnixNano()/1000000),
 		elastic.NewTermQuery("@cf.env.keyword", server.CFEnv),
-		elastic.NewTermQuery("@cf.space_id.keyword", a.SpaceGuid),
-		elastic.NewTermQuery("@cf.app.keyword", stripSuffixes(a.Name)), // we use name here as it's more robust across blue/green style deployments
+		elastic.NewTermsSetQuery("@cf.space_id.keyword", spaceIDs...),
+		//elastic.NewTermQuery("@cf.app.keyword", stripSuffixes(a.Name)), // we use name here as it's more robust across blue/green style deployments
 	).Must(elastic.NewQueryStringQuery(q))
 
 	src, err = query.Source()

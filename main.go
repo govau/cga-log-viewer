@@ -90,5 +90,6 @@ func main() {
 		CSRFKey:       csrfKey,
 		ElasticClient: elasticClient,
 		CFEnv:         envVars.MustString("OUR_LOCATION"),
+		UAAUrl:        uaaURL,
 	}).CreateHTTPHandler())))
 }

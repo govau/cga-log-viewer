@@ -50,6 +50,9 @@ type server struct {
 
 	// CFEnv must filter
 	CFEnv string
+
+	// UAAURL
+	UAAUrl string
 }
 
 // Shows all apps for space
