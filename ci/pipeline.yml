@@ -1,4 +1,50 @@
 jobs:
+- name: log-proxy-build-container-image
+  serial: true
+  plan:
+  - do:
+    - get: log-proxy-src
+      trigger: true
+    - put: log-proxy-img
+      params:
+        build: log-proxy-src
+        tag_file: log-proxy-src/.git/ref
+      get_params: {skip_download: true}
+    on_success:
+      put: slack
+      params:
+        text: |
+          :white_check_mark: $BUILD_JOB_NAME SUCCESS
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: $BUILD_JOB_NAME FAILED
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+- name: es-proxy-build-container-image
+  serial: true
+  plan:
+  - do:
+    - get: es-proxy-src
+      trigger: true
+    - put: es-proxy-img
+      params:
+        build: es-proxy-src
+        tag_file: es-proxy-src/.git/ref
+      get_params: {skip_download: true}
+    on_success:
+      put: slack
+      params:
+        text: |
+          :white_check_mark: $BUILD_JOB_NAME SUCCESS
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: $BUILD_JOB_NAME FAILED
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
 - name: log-viewer-build-container-image
   serial: true
   plan:
@@ -26,12 +72,24 @@ jobs:
   serial: true
   plan:
   - do:
-    - get: src
-      passed: [log-viewer-build-container-image]
     - get: ci
       trigger: true
+    - get: src
+      passed: [log-viewer-build-container-image]
     - get: img
       passed: [log-viewer-build-container-image]
+      params: {skip_download: true}
+      trigger: true
+    - get: log-proxy-src
+      passed: [log-proxy-build-container-image]
+    - get: log-proxy-img
+      passed: [log-proxy-build-container-image]
+      params: {skip_download: true}
+      trigger: true
+    - get: es-proxy-src
+      passed: [es-proxy-build-container-image]
+    - get: es-proxy-img
+      passed: [es-proxy-build-container-image]
       params: {skip_download: true}
       trigger: true
     - task: build
@@ -55,12 +113,24 @@ jobs:
   serial: true
   plan:
   - do:
-    - get: src
-      passed: [log-viewer-deploy-d]
     - get: ci
+      passed: [log-viewer-deploy-d]
+    - get: src
       passed: [log-viewer-deploy-d]
     - get: img
       passed: [log-viewer-deploy-d]
+      params: {skip_download: true}
+      trigger: true
+    - get: log-proxy-src
+      passed: [log-proxy-deploy-d]
+    - get: log-proxy-img
+      passed: [log-proxy-deploy-d]
+      params: {skip_download: true}
+      trigger: true
+    - get: es-proxy-src
+      passed: [es-proxy-deploy-d]
+    - get: es-proxy-img
+      passed: [es-proxy-deploy-d]
       params: {skip_download: true}
       trigger: true
     - task: build
@@ -84,12 +154,24 @@ jobs:
   serial: true
   plan:
   - do:
-    - get: src
-      passed: [log-viewer-deploy-y]
     - get: ci
+      passed: [log-viewer-deploy-y]
+    - get: src
       passed: [log-viewer-deploy-y]
     - get: img
       passed: [log-viewer-deploy-y]
+      params: {skip_download: true}
+      trigger: true
+    - get: log-proxy-src
+      passed: [log-proxy-deploy-y]
+    - get: log-proxy-img
+      passed: [log-proxy-deploy-y]
+      params: {skip_download: true}
+      trigger: true
+    - get: es-proxy-src
+      passed: [es-proxy-deploy-y]
+    - get: es-proxy-img
+      passed: [es-proxy-deploy-y]
       params: {skip_download: true}
       trigger: true
     - task: build
@@ -117,6 +199,20 @@ resources:
     branch: master
     ignore_paths:
     - ci/**
+- name: es-proxy-src
+  type: git
+  source:
+    uri: https://github.com/govau/aws-es-proxy
+    branch: govau
+    ignore_paths:
+    - ci/**
+- name: log-proxy-src
+  type: git
+  source:
+    uri: https://github.com/govau/cga-log-proxy
+    branch: master
+    ignore_paths:
+    - ci/**
 - name: ci
   type: git
   source:
@@ -125,6 +221,18 @@ resources:
     paths:
     - ci/**
 - name: img
+  type: docker-image
+  source:
+    repository: ((aws_repository))
+    aws_access_key_id: ((aws_access_key_id))
+    aws_secret_access_key: ((aws_secret_access_key))
+- name: es-proxy-img
+  type: docker-image
+  source:
+    repository: ((aws_repository))
+    aws_access_key_id: ((aws_access_key_id))
+    aws_secret_access_key: ((aws_secret_access_key))
+- name: log-proxy-img
   type: docker-image
   source:
     repository: ((aws_repository))

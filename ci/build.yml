@@ -8,9 +8,13 @@ image_resource:
     tag: latest
 
 inputs:
-- name: src
 - name: ci
+- name: src
 - name: img
+- name: log-proxy-src
+- name: log-proxy-img
+- name: es-proxy-src
+- name: es-proxy-img
 
 outputs: []
 
