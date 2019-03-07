@@ -1,8 +1,4 @@
 [[constraint]]
-  name = "github.com/aws/aws-sdk-go"
-  version = "1.16.30"
-
-[[constraint]]
   branch = "master"
   name = "github.com/cloudfoundry-community/go-cfclient"
 
@@ -15,16 +11,8 @@
   version = "1.5.1"
 
 [[constraint]]
-  name = "github.com/gorilla/mux"
-  version = "1.7.0"
-
-[[constraint]]
   name = "github.com/govau/cf-common"
   version = "0.0.7"
-
-[[constraint]]
-  name = "github.com/olivere/elastic"
-  version = "6.2.16"
 
 [prune]
   go-tests = true

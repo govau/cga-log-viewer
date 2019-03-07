@@ -18,28 +18,6 @@
   version = "v1.4.2"
 
 [[projects]]
-  digest = "1:dbe4c63d0071bcb2d2a7f251e9c4f7a6b4effff13de90a7957c25a8d4ae965b4"
-  name = "github.com/aws/aws-sdk-go"
-  packages = [
-    "aws",
-    "aws/awserr",
-    "aws/awsutil",
-    "aws/client/metadata",
-    "aws/credentials",
-    "aws/endpoints",
-    "aws/request",
-    "aws/signer/v4",
-    "internal/ini",
-    "internal/sdkio",
-    "internal/shareddefaults",
-    "private/protocol",
-    "private/protocol/rest",
-  ]
-  pruneopts = "UT"
-  revision = "130e7e7f5cfa00e267b884bd2772ae986f9e8273"
-  version = "v1.16.30"
-
-[[projects]]
   branch = "master"
   digest = "1:a965e93173d9b30de4cc01c4a2aaaaa0478ece976f56dabb6e662800abf21011"
   name = "github.com/cloudfoundry-community/go-cfclient"
@@ -88,14 +66,6 @@
   version = "v1.5.1"
 
 [[projects]]
-  digest = "1:ca59b1175189b3f0e9f1793d2c350114be36eaabbe5b9f554b35edee1de50aea"
-  name = "github.com/gorilla/mux"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "a7962380ca08b5a188038c69871b8d3fbdf31e89"
-  version = "v1.7.0"
-
-[[projects]]
   digest = "1:e72d1ebb8d395cf9f346fd9cbc652e5ae222dd85e0ac842dc57f175abed6d195"
   name = "github.com/gorilla/securecookie"
   packages = ["."]
@@ -123,45 +93,12 @@
   version = "v0.0.7"
 
 [[projects]]
-  digest = "1:bb81097a5b62634f3e9fec1014657855610c82d19b9a40c17612e32651e35dca"
-  name = "github.com/jmespath/go-jmespath"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "c2b33e84"
-
-[[projects]]
-  branch = "master"
-  digest = "1:aa3d8d42865c42626b5c1add193692d045b3188b1479f0a0a88690d21fe20083"
-  name = "github.com/mailru/easyjson"
-  packages = [
-    ".",
-    "buffer",
-    "jlexer",
-    "jwriter",
-  ]
-  pruneopts = "UT"
-  revision = "60711f1a8329503b04e1c88535f419d0bb440bff"
-
-[[projects]]
   digest = "1:53bc4cd4914cd7cd52139990d5170d6dc99067ae31c56530621b18b35fc30318"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
   pruneopts = "UT"
   revision = "3536a929edddb9a5b34bd6861dc4a9647cb459fe"
   version = "v1.1.2"
-
-[[projects]]
-  digest = "1:29d64f8d7e127ac9360b0ebbdd0707772e06879ed4b24117ecd3a1c0dc3e18a1"
-  name = "github.com/olivere/elastic"
-  packages = [
-    ".",
-    "aws/v4",
-    "config",
-    "uritemplates",
-  ]
-  pruneopts = "UT"
-  revision = "407a1d940dcc89e279c579eb393d0bdde8fd9ac4"
-  version = "v6.2.16"
 
 [[projects]]
   digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
@@ -222,15 +159,11 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/aws/aws-sdk-go/aws/credentials",
     "github.com/cloudfoundry-community/go-cfclient",
     "github.com/cloudfoundry-community/go-cfenv",
     "github.com/gorilla/csrf",
-    "github.com/gorilla/mux",
     "github.com/govau/cf-common/env",
     "github.com/govau/cf-common/uaa",
-    "github.com/olivere/elastic",
-    "github.com/olivere/elastic/aws/v4",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

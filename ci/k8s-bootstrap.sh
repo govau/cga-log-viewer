@@ -112,37 +112,6 @@ spec:
         port:
           number: 443
       weight: 100
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: aws-es-proxy
-  labels:
-    app: aws-es-proxy
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: aws-es-proxy
-  template:
-    metadata:
-      labels:
-        app: aws-es-proxy
-    spec:
-      containers:
-      - name: aws-es-proxy
-        image: 159633342269.dkr.ecr.ap-southeast-2.amazonaws.com/aws-es-proxy:87d9357cae4704339a1a0177763de27d3f040bed
-        ports:
-        - name: http
-          containerPort: 9200
-        resources: {limits: {memory: "64Mi", cpu: "100m"}}
-        args:
-        - -listen
-        - :9200
-        - -endpoint
-        - "\$(AWS_ES_URL)"
-        envFrom:
-        - secretRef: {name: aws-es-proxy}
 EOF
 )
 
