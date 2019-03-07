@@ -16,7 +16,6 @@ import (
 	"time"
 
 	cfclient "github.com/cloudfoundry-community/go-cfclient"
-	"github.com/gorilla/csrf"
 	"github.com/govau/cf-common/uaa"
 )
 
@@ -145,12 +144,8 @@ func (server *server) augmentRequest(req *http.Request, liu *uaa.LoggedInUser) e
 
 // Create a handler
 func (server *server) CreateHTTPHandler() http.Handler {
-	// Wrap nearly everything with a CSRF
-	var opts []csrf.Option
-	if server.Insecure {
-		opts = append(opts, csrf.Secure(false))
-	}
-	return csrf.Protect(server.CSRFKey, opts...)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// let's assume kibana does it's own XSRF - TODO fixme
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		liu, ok := r.Context().Value(uaa.KeyLoggedInUser).(*uaa.LoggedInUser)
 		if !ok {
 			log.Println("bad type")
@@ -204,5 +199,5 @@ func (server *server) CreateHTTPHandler() http.Handler {
 		if err != nil {
 			log.Println(err) // can't do http.Error as status code is already written
 		}
-	}))
+	})
 }
