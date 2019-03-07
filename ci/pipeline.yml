@@ -122,15 +122,15 @@ jobs:
       params: {skip_download: true}
       trigger: true
     - get: log-proxy-src
-      passed: [log-proxy-deploy-d]
+      passed: [log-viewer-deploy-d]
     - get: log-proxy-img
-      passed: [log-proxy-deploy-d]
+      passed: [log-viewer-deploy-d]
       params: {skip_download: true}
       trigger: true
     - get: es-proxy-src
-      passed: [es-proxy-deploy-d]
+      passed: [log-viewer-deploy-d]
     - get: es-proxy-img
-      passed: [es-proxy-deploy-d]
+      passed: [log-viewer-deploy-d]
       params: {skip_download: true}
       trigger: true
     - task: build
@@ -163,15 +163,15 @@ jobs:
       params: {skip_download: true}
       trigger: true
     - get: log-proxy-src
-      passed: [log-proxy-deploy-y]
+      passed: [log-viewer-deploy-y]
     - get: log-proxy-img
-      passed: [log-proxy-deploy-y]
+      passed: [log-viewer-deploy-y]
       params: {skip_download: true}
       trigger: true
     - get: es-proxy-src
-      passed: [es-proxy-deploy-y]
+      passed: [log-viewer-deploy-y]
     - get: es-proxy-img
-      passed: [es-proxy-deploy-y]
+      passed: [log-viewer-deploy-y]
       params: {skip_download: true}
       trigger: true
     - task: build
