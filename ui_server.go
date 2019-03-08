@@ -138,7 +138,7 @@ func (server *server) augmentRequest(req *http.Request, liu *uaa.LoggedInUser) e
 		server.uc[liu.EmailAddress] = val
 	}
 
-	req.Header.Set("X-ElasticSearch-Filters", val.Filter)
+	req.Header.Set("X-Elasticsearch-Filters", val.Filter)
 	return nil
 }
 
