@@ -121,11 +121,8 @@ func (server *server) augmentRequest(req *http.Request, liu *uaa.LoggedInUser) e
 		}
 
 		bb, err := json.Marshal(map[string]interface{}{
-			"terms_set": map[string]interface{}{
-				"@cf.space_id.keyword": map[string]interface{}{
-					"terms":                guids,
-					"minimum_should_match": 1,
-				},
+			"terms": map[string]interface{}{
+				"@cf.space_id.keyword": guids,
 			},
 		})
 		if err != nil {
