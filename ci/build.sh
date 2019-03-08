@@ -142,7 +142,7 @@ spec:
         ports:
         - name: http
           containerPort: 9200
-        resources: {limits: {memory: "64Mi", cpu: "250m"}}
+        resources: {limits: {memory: "64Mi", cpu: "750m"}}
         args:
         - -listen
         - :9200
