@@ -110,23 +110,38 @@ func (server *server) augmentRequest(req *http.Request, liu *uaa.LoggedInUser) e
 			return err
 		}
 
-		spaces, err := cli.ListUserSpaces(userInfo.GUID)
+		orgs, err := cli.ListUserManagedOrgs(userInfo.GUID)
 		if err != nil {
 			return err
 		}
-
-		var guids []string
-		for _, sp := range spaces {
-			guids = append(guids, sp.Guid)
+		superUser := false
+		for _, o := range orgs {
+			if o.Name == "system" {
+				superUser = true
+				break
+			}
 		}
 
-		bb, err := json.Marshal(map[string]interface{}{
-			"terms": map[string]interface{}{
-				"@cf.space_id.keyword": guids,
-			},
-		})
-		if err != nil {
-			return err
+		var bb []byte
+		if !superUser { // if not a super user, then filter on space GUIDs
+			spaces, err := cli.ListUserSpaces(userInfo.GUID)
+			if err != nil {
+				return err
+			}
+
+			var guids []string
+			for _, sp := range spaces {
+				guids = append(guids, sp.Guid)
+			}
+
+			bb, err = json.Marshal(map[string]interface{}{
+				"terms": map[string]interface{}{
+					"@cf.space_id.keyword": guids,
+				},
+			})
+			if err != nil {
+				return err
+			}
 		}
 
 		val = &userCache{
