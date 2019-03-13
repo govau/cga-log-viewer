@@ -113,7 +113,7 @@ spec:
         ports:
         - name: http
           containerPort: 5601
-        resources: {limits: {memory: "64Mi", cpu: "100m"}}
+        resources: {limits: {memory: "64Mi", cpu: "250m"}}
         env:
         - name: PORT
           value: "5601"
@@ -127,7 +127,7 @@ spec:
         ports:
         - name: http
           containerPort: 9300
-        resources: {limits: {memory: "64Mi", cpu: "100m"}}
+        resources: {limits: {memory: "64Mi", cpu: "250m"}}
         args:
         - -listen
         - :9300
