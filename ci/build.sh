@@ -25,6 +25,16 @@ spec:
     port: 5601
     targetPort: 5601
 ---
+apiVersion: "authentication.istio.io/v1alpha1"
+kind: "Policy"
+metadata:
+  name: "${ENV}cld-log-viewer"
+spec:
+  targets:
+  - name: "${ENV}cld-log-viewer" # TODO - remove this softness that allows HTTP traffic to this service - currently here so that the ingress controller is happy
+  peers:
+  - mtls: {}
+---
 apiVersion: networking.istio.io/v1alpha3
 kind: ServiceEntry
 metadata:
