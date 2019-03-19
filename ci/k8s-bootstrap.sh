@@ -14,6 +14,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: "${NAMESPACE}"
+  labels:
+    istio-injection: enabled
 EOF
 )
 
