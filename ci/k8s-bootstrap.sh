@@ -34,6 +34,9 @@ rules:
 - apiGroups: ["networking.istio.io"]
   resources: ["serviceentries", "virtualservices"]
   verbs: ["*"]
+- apiGroups: ["authentication.istio.io"]
+  resources: ["policies"]
+  verbs: ["*"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
