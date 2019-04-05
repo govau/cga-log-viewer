@@ -25,16 +25,6 @@ spec:
     port: 5601
     targetPort: 5601
 ---
-apiVersion: "authentication.istio.io/v1alpha1"
-kind: "Policy"
-metadata:
-  name: "${ENV}cld-log-viewer"
-spec:
-  targets:
-  - name: "${ENV}cld-log-viewer" # TODO - remove this softness that allows HTTP traffic to this service - currently here so that the ingress controller is happy
-  peers:
-  - mtls: {}
----
 apiVersion: networking.istio.io/v1alpha3
 kind: ServiceEntry
 metadata:
@@ -160,6 +150,8 @@ spec:
         - "\$(AWS_ES_URL)"
         envFrom:
         - secretRef: {name: aws-es-proxy}
+
+
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -181,37 +173,6 @@ spec:
       - backend:
           serviceName: ${ENV}cld-log-viewer
           servicePort: 5601
----
-apiVersion: networking.istio.io/v1alpha3
-kind: Gateway
-metadata:
-  name: ${ENV}cld-log-viewer
-spec:
-  selector:
-    istio: ingressgateway # use Istio default gateway implementation
-  servers:
-  - port:
-      number: 80
-      name: http
-      protocol: HTTP
-    hosts:
-    - "${ENV}cld-logs2.kapps.cld.gov.au"
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: ${ENV}cld-log-viewer
-spec:
-  hosts:
-  - "${ENV}cld-logs2.kapps.l.cld.gov.au"
-  gateways:
-  - ${ENV}cld-log-viewer
-  http:
-  - route:
-    - destination:
-       port:
-         number: 5601
-       host: ${ENV}cld-log-viewer
 EOF
 
 cat deployment.yaml

@@ -14,8 +14,6 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: "${NAMESPACE}"
-  labels:
-    istio-injection: enabled
 EOF
 )
 
@@ -32,14 +30,7 @@ metadata:
   name: istio-config
 rules:
 - apiGroups: ["networking.istio.io"]
-  resources:
-  - serviceentries
-  - virtualservices
-  - gateways
-  verbs: ["*"]
-- apiGroups: ["authentication.istio.io"]
-  resources:
-  - policies
+  resources: ["serviceentries", "virtualservices"]
   verbs: ["*"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
