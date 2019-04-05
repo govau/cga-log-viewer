@@ -203,7 +203,7 @@ metadata:
   name: ${ENV}cld-log-viewer
 spec:
   hosts:
-  - "${ENV}cld-logs2.kapps.cld.gov.au"
+  - "${ENV}cld-logs2.kapps.l.cld.gov.au"
   gateways:
   - ${ENV}cld-log-viewer
   http:
